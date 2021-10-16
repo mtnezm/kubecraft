@@ -55,5 +55,3 @@
   tags:
     - delete-dns-srv-record
     - destroy
-
-# A futuro: en caso de hacer backups, borrar
