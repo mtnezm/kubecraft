@@ -1,0 +1,17 @@
+---
+- hosts: K8S
+  become: yes
+  become_user: root
+  become_method: sudo
+
+  roles:
+    - role: minecraft-standard
+    # add other Minecraft versions as roles here
+
+  vars:
+    - KUBERNETES_NODE: "<node_id here>"
+    - KUBERNETES_NODE_ADDRESS: "<node_ip_address here>"
+    - CLOUDFLARE_EMAIL: "<cloudflare_email here>"
+    - CLOUDFLARE_API_TOKEN: "<cloudflare_api_token here>"
+    - DOMAIN: "<domain.tld here>"
+    - SUBDOMAIN: "<sub.domain.tld here>"

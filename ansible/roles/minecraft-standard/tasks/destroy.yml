@@ -1,0 +1,59 @@
+---
+- name: Get client {{ CLIENT_SEED }} MC instance port
+  shell: "kubectl get svc -n client-{{ CLIENT_SEED }} |awk '{ print $5 }' |cut -d\/ -f1 |tail -1"
+  register: MC_SERVER_PORT
+  tags:
+    - destroy
+
+- name: Remove MC server for client {{ CLIENT_SEED }}
+  command: "kubectl delete ns client-{{ CLIENT_SEED }}"
+  tags:
+    - destroy
+    - delete-k8s-client-ns
+
+- name: Remove MC server data for client {{ CLIENT_SEED }}
+  command: "kubectl delete pv {{ CLIENT_SEED }}-data"
+  tags:
+    - destroy
+    - delete-mc-data
+
+- name: Remove client server data directory
+  file:
+    path: /data/{{ CLIENT_SEED }}-data
+    state: absent
+  tags:
+    - destroy
+    - delete-data-dir
+
+- name: Delete CNAME record for {{ CLIENT_SEED }}
+  community.general.cloudflare_dns:
+    zone: "{{ DOMAIN }}"
+    value: "{{ SUBDOMAIN }}"
+    type: CNAME
+    record: "{{ CLIENT_SEED }}.minecraft.{{ DOMAIN }}"
+    account_email: "{{ CLOUDFLARE_EMAIL }}"
+    account_api_token: "{{ CLOUDFLARE_API_TOKEN }}"
+    state: absent
+  tags:
+    - delete-dns-cname-record
+    - destroy
+
+- name: Delete SRV record for {{ CLIENT_SEED }}
+  community.general.cloudflare_dns:
+    domain: "{{ DOMAIN }}"
+    record: "{{ CLIENT_SEED }}.minecraft.{{ DOMAIN }}"
+    account_email: "{{ CLOUDFLARE_EMAIL }}"
+    account_api_token: "{{ CLOUDFLARE_API_TOKEN }}"
+    state: absent
+    service: _minecraft
+    proto: tcp
+    port: "{{ MC_SERVER_PORT.stdout }}"
+    priority: 0
+    weight: 0
+    type: SRV
+    value: "{{ CLIENT_SEED }}.minecraft.{{ DOMAIN }}"
+  tags:
+    - delete-dns-srv-record
+    - destroy
+
+# A futuro: en caso de hacer backups, borrar

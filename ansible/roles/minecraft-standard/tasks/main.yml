@@ -1,0 +1,20 @@
+---
+- include_tasks: deploy.yml
+  tags:
+    - deploy
+    - assign-id
+    - assign-port
+    - create-data-directory
+    - copy-k8s-file
+    - remove-k8s-file
+    - create-dns-cname-record
+    - create-dns-srv-record
+
+- include_tasks: destroy.yml
+  tags:
+    - destroy
+    - delete-k8s-client-ns
+    - delete-mc-data
+    - delete-data-dir
+    - delete-dns-cname-record
+    - delete-dns-srv-record
