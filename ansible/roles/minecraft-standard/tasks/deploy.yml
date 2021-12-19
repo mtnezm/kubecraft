@@ -244,6 +244,3 @@
   tags:
     - create-dns-srv-record
     - deploy
-
-# To make multiple subdomains work from a single public IP access, we'll
-# also need a SRV record for each server deployed pointing to its assigned port
